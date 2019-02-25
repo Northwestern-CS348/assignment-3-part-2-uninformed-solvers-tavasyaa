@@ -34,7 +34,34 @@ class TowerOfHanoiGame(GameMaster):
             A Tuple of Tuples that represent the game state
         """
         ### student code goes here
-        pass
+
+        output1 = []
+        output2 = []
+        output3 = []
+
+        disks1 = self.kb.kb_ask(parse_input('fact: (on ?disk peg1'))
+        disks2 = self.kb.kb_ask(parse_input('fact: (on ?disk peg2'))
+        disks3 = self.kb.kb_ask(parse_input('fact: (on ?disk peg3'))
+
+        if disks1:
+            for disks in disks1:
+                output1.append(int(str(disks.bindings[0].constant)[-1]))
+        if disks2:
+            for disks in disks2:
+                output2.append(int(str(disks.bindings[0].constant)[-1]))
+        if disks3:
+            for disks in disks3:
+                output3.append(int(str(disks.bindings[0].constant)[-1]))
+
+        output1.sort()
+        output2.sort()
+        output3.sort()
+
+        gs_hanoi = (tuple(output1), tuple(output2), tuple(output3))
+
+        return gs_hanoi
+
+
 
     def makeMove(self, movable_statement):
         """
@@ -52,8 +79,29 @@ class TowerOfHanoiGame(GameMaster):
         Returns:
             None
         """
-        ### Student code goes here
-        pass
+        game_state = self.getGameState()
+        disk =  str(movable_statement.terms[0].term)
+        init_peg = str(movable_statement.terms[1].term)
+        init_peg_num = int(init_peg[-1])
+        target_peg = str(movable_statement.terms[2].term)
+        target_peg_num = int(target_peg[-1])
+
+        if len(game_state[target_peg_num - 1]) > 0:
+            self.kb.kb_retract(parse_input('fact: (top disk' + str(game_state[target_peg_num - 1][0]) + ' ' + target_peg + ')'))
+        else:
+            self.kb.kb_retract(parse_input('fact: (empty ' + target_peg + ')'))
+
+        self.kb.kb_retract(parse_input('fact: (on ' + disk + ' ' + init_peg + ')'))
+        self.kb.kb_retract(parse_input('fact: (top ' + disk + ' ' + init_peg + ')'))
+        self.kb.kb_add(parse_input('fact: (on ' + disk + ' ' + target_peg + ')'))
+        self.kb.kb_add(parse_input('fact: (top ' + disk + ' ' + target_peg + ')'))
+
+        if len(game_state[init_peg_num - 1]) <= 1:
+            self.kb.kb_add(parse_input('fact: (empty ' + init_peg + ')'))
+
+        else:
+            self.kb.kb_add(
+                parse_input('fact: (top disk' + str(game_state[init_peg_num - 1][1]) + ' ' + init_peg + ')'))
 
     def reverseMove(self, movable_statement):
         """
@@ -99,9 +147,27 @@ class Puzzle8Game(GameMaster):
         Returns:
             A Tuple of Tuples that represent the game state
         """
-        ### Student code goes here
-        pass
 
+        currentstate= [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+        positions = {"pos1": ("pos1", "pos2", "pos3"),
+                "pos2": ("pos1", "pos2", "pos3"),
+                "pos3": ("pos1", "pos2", "pos3")}
+
+        for ys in positions:
+            y = int(ys[3]) - 1
+            for xs in positions[ys]:
+                x = int(xs[3]) - 1
+                ask = self.kb.kb_ask(Fact(Statement(["coordinate", "?tile", xs, ys])))[0]
+                tile = ask.bindings_dict["?tile"][4]
+                tile_val = 0
+                if tile == 'y':
+                    tile_val = -1
+                else:
+                    tile_val = int(tile)
+                currentstate[y][x] = tile_val
+
+        return tuple([tuple(currentstate[0]), tuple(currentstate[1]), tuple(currentstate[2])])
+        
     def makeMove(self, movable_statement):
         """
         Takes a MOVABLE statement and makes the corresponding move. This will
@@ -118,8 +184,16 @@ class Puzzle8Game(GameMaster):
         Returns:
             None
         """
-        ### Student code goes here
-        pass
+        tile = str(movable_statement.terms[0].term)
+        x = str(movable_statement.terms[1].term)
+        y =  str(movable_statement.terms[2].term)
+        targetx =  str(movable_statement.terms[3].term)
+        targety =  str(movable_statement.terms[4].term)
+
+        self.kb.kb_retract(parse_input('fact: (coordinate ' + tile + ' ' + x + ' ' + y + ')'))
+        self.kb.kb_retract(parse_input('fact: (coordinate empty ' + targetx + ' ' + targety + ')'))
+        self.kb.kb_add(parse_input('fact: (coordinate empty ' + x + ' ' + y + ')'))
+        self.kb.kb_add(parse_input('fact: (coordinate ' + tile + ' ' + targetx + ' ' + targety + ')'))
 
     def reverseMove(self, movable_statement):
         """
