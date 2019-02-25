@@ -45,6 +45,7 @@ class SolverDFS(UninformedSolver):
                 if not self.currentState.parent and self.currentState.nextChildToVisit == len(self.currentState.children):
                     dfsflag = False
 
+                    # error part -- check it out
                 if self.currentState.nextChildToVisit >= len(self.currentState.children):
                     self.gm.reverseMove(self.currentState.requiredMovable)
                     self.currentState = self.currentState.parent
@@ -106,7 +107,7 @@ class SolverBFS(UninformedSolver):
             nextup = self.queue.get()
             if nextup in self.visited:
                 continue
-
+                # can't remember how i fixed
             while nextup.requiredMovable:
                 newsteps.append(nextup.requiredMovable)
                 nextup = nextup.parent

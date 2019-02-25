@@ -187,13 +187,13 @@ class Puzzle8Game(GameMaster):
         tile = str(movable_statement.terms[0].term)
         x = str(movable_statement.terms[1].term)
         y =  str(movable_statement.terms[2].term)
-        targetx =  str(movable_statement.terms[3].term)
-        targety =  str(movable_statement.terms[4].term)
+        aimx =  str(movable_statement.terms[3].term)
+        aimy =  str(movable_statement.terms[4].term)
 
         self.kb.kb_retract(parse_input('fact: (coordinate ' + tile + ' ' + x + ' ' + y + ')'))
-        self.kb.kb_retract(parse_input('fact: (coordinate empty ' + targetx + ' ' + targety + ')'))
+        self.kb.kb_retract(parse_input('fact: (coordinate empty ' + aimx + ' ' + aimy + ')'))
         self.kb.kb_add(parse_input('fact: (coordinate empty ' + x + ' ' + y + ')'))
-        self.kb.kb_add(parse_input('fact: (coordinate ' + tile + ' ' + targetx + ' ' + targety + ')'))
+        self.kb.kb_add(parse_input('fact: (coordinate ' + tile + ' ' + aimx + ' ' + aimy + ')'))
 
     def reverseMove(self, movable_statement):
         """
